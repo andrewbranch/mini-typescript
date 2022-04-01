@@ -2,6 +2,16 @@
 
 Add `const` variable declarations. Currently, `var` is supported. `const` should behave the same, but trigger a checker error when reassigned.
 
+```ts
+// Already implemented:
+var x: number = 0;
+x = 1;
+
+// Your task is to make this compile:
+const y: number = 1;
+y = 2; // This should be an error
+```
+
 ## Test
 
 A simple test has already been added at [tests/const.ts](./tests/const.ts).
