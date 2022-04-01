@@ -66,8 +66,8 @@ export type TypeAlias = Location & {
     typename: Identifier
 }
 export type Declaration = Var | TypeAlias // plus others, like function
-export type Symbol = { 
-    valueDeclaration: Declaration | undefined
+export type Symbol = {
+    valueDeclaration: Var | undefined
     declarations: Declaration[] 
 }
 export type Table = Map<string, Symbol>
