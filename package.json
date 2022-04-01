@@ -5,8 +5,9 @@
   "main": "compiler/index.js",
   "scripts": {
     "build": "tsc",
-    "test": "rm baselines/local/*; tsc && node built/test.js",
-    "accept": "mv baselines/local/* baselines/reference/",
+    "pretest": "npm run build; node scripts/pretest.js",
+    "test": "node built/test.js",
+    "accept": "node scripts/accept.js",
     "mtsc": "node built/index.js"
   },
   "repository": {
