@@ -3,8 +3,9 @@ import { Module, Statement, Token, Node, Identifier, Expression, Table } from '.
 import { lexAll } from './lex'
 import { compile } from './compile'
 
-const args = process.argv.slice(2);
+const args = process.argv.slice(2)
 const write = args.includes("--write")
+const tests = args.indexOf("--tests") > -1 ? args[args.indexOf("--tests") + 1] : undefined
 
 const strong = (str: string) => console.log('\x1b[1m%s\x1b[0m', str);
 
@@ -54,11 +55,14 @@ const lexTests = {
 let lexResult = sum(Object.entries(lexTests).map(
     ([name, text]) => test("lex", name, lexAll(text).map(t => t.text ? [Token[t.token], t.text] : [Token[t.token]]))))
 let compileResult = sum(fs.readdirSync("tests").map(file => {
-    const [tree, errors, js] = compile(fs.readFileSync("tests/" + file, 'utf8'))
-    const name = file.slice(0, file.length - 3)
-    return test("tree", name, displayModule(tree))
-        + test("errors", name, errors)
-        + test("js", name, js)
+    if (!tests || file.startsWith(tests)) {
+        const [tree, errors, js] = compile(fs.readFileSync("tests/" + file, 'utf8'))
+        const name = file.slice(0, file.length - 3)
+        return test("tree", name, displayModule(tree))
+            + test("errors", name, errors)
+            + test("js", name, js)
+    }
+    return 0
 }))
 function displayModule(m: Module) {
     return { locals: displayTable(m.locals), statements: m.statements.map(display) }
