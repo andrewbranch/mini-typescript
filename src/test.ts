@@ -1,5 +1,5 @@
 import * as fs from 'fs'
-import { Module, Statement, Token, Node, Identifier, Expression, Table } from './types'
+import { Module, Statement, Token, Node, Identifier, Expression, Table, Error } from './types'
 import { lexAll } from './lex'
 import { compile } from './compile'
 
@@ -12,7 +12,7 @@ const strong = (str: string) => console.log('\x1b[1m%s\x1b[0m', str);
 function test(kind: string, name: string, value: unknown) {
     const reference = `baselines/reference/${name}.${kind}.baseline`
     const local = `baselines/local/${name}.${kind}.baseline`
-    const actual = JSON.stringify(value, undefined, 2)
+    const actual = typeof value === "string" ? value : JSON.stringify(value, undefined, 2)
     const expected = fs.existsSync(reference) ? fs.readFileSync(reference, "utf8") : ""
     if (actual !== expected) {
         if (!fs.existsSync("./baselines/local")) fs.mkdirSync("./baselines/local")
@@ -56,10 +56,11 @@ let lexResult = sum(Object.entries(lexTests).map(
     ([name, text]) => test("lex", name, lexAll(text).map(t => t.text ? [Token[t.token], t.text] : [Token[t.token]]))))
 let compileResult = sum(fs.readdirSync("tests").map(file => {
     if (!tests || file.startsWith(tests)) {
-        const [tree, errors, js] = compile(fs.readFileSync("tests/" + file, 'utf8'))
+        const content = fs.readFileSync("tests/" + file, 'utf8')
+        const [tree, errors, js] = compile(content)
         const name = file.slice(0, file.length - 3)
         return test("tree", name, displayModule(tree))
-            + test("errors", name, errors)
+            + test("errors", name, displayErrors(errors, content))
             + test("js", name, js)
     }
     return 0
@@ -73,6 +74,29 @@ function displayTable(table: Table) {
         o[k] = v.declarations.map(({ kind, pos }) => ({ kind: Node[kind], pos }))
     }
     return o
+}
+function displayErrors(errors: Error[], content: string) {
+    if (!errors.length) return '(no errors)'
+    errors = errors.slice()
+    let linePos = 0
+    let pos = 0
+    let out = ''
+    while (pos < content.length) {
+        if (content[pos] === '\r' && content[pos + 1] === '\n' || content[pos] === '\n') {
+            pos += content[pos] === '\r' ? 2 : 1
+            out += content.slice(linePos, pos)
+            for (const error of errors) {
+                if (error.pos < linePos || error.pos > pos) break;
+                out += ' '.repeat(error.pos - linePos) + '^ ' + error.message + '\n'
+                errors.shift()
+            }
+            linePos = pos
+        }
+        else {
+            pos++
+        }
+    }
+    return out
 }
 function display(o: any) {
     const o2 = {} as any

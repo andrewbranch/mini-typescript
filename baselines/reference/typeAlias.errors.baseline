@@ -1,18 +1,15 @@
-[
-  {
-    "pos": 76,
-    "message": "Cannot redeclare Not; first declared at 57"
-  },
-  {
-    "pos": 124,
-    "message": "Cannot assign initialiser of type 'number' to variable with declared type 'string'."
-  },
-  {
-    "pos": 153,
-    "message": "Could not resolve type Nut"
-  },
-  {
-    "pos": 192,
-    "message": "Could not resolve Net"
-  }
-]
+type Nat = number;
+var Nat = 12;
+var nat: Nat = 13;
+
+type Not = string;
+type Not = number;
+    ^ Cannot redeclare Not; first declared at 57
+type Nit = Not;
+var nit: Not = 14;
+                 ^ Cannot assign initialiser of type 'number' to variable with declared type 'string'.
+
+var Nut = 15;
+var nut: Nut = 16;
+            ^ Could not resolve type Nut
+type Net = number;

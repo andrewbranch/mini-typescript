@@ -12,6 +12,8 @@ const y: number = 1;
 y = 2; // This should be an error
 ```
 
+**_Hint_**: It’s easier if you don’t make a new `Node` kind.
+
 ## Test
 
 A simple test has already been added at [tests/const.ts](./tests/const.ts).
