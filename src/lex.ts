@@ -16,7 +16,7 @@ export function lex(s: string): Lexer {
         text: () => text,
     }
     function scan() {
-        scanForward(c => /[ \t\b\n]/.test(c))
+        scanForward(c => /[ \t\b\r\n]/.test(c))
         const start = pos
         if (pos === s.length) {
             token = Token.EOF
